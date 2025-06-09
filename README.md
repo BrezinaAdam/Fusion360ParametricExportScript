@@ -24,88 +24,72 @@ The power of this script lies in the JSON configuration file. Here is a breakdow
 
 ### Top-Level Keys
 
-- `outputDirectory`: (String) The name of the folder where the exported files will be saved. This folder is created in the same directory as the configuration file.
-- `bodiesToExport`: (List of Strings) A list of the exact names of the bodies you want to export from your Fusion 360 design.
+- `outputDirectory`: (String) The name of the folder where the exported files will be saved.
+- `bodiesToExport`: (List of Strings) A list of the exact names of the bodies you want to export.
+- `exportOptions`: (Object, Optional) A powerful section to control the export format and naming.
 - `parametersToIterate`: (Object) An object where you define the User Parameters from your Fusion 360 design that you want to change.
+
+### `exportOptions` Object (New in v2)
+
+This optional object gives you fine-grained control over the output.
+
+- `fileType`: (String, Optional) The type of file to export. Supported values are `"STL"`, `"STEP"`, and `"IGES"`. Defaults to `"STL"`.
+- `stlQuality`: (String, Optional) The mesh quality for STL exports. Supported values are `"High"`, `"Medium"`, and `"Low"`. Defaults to `"Medium"`.
+- `fileNameTemplate`: (String, Optional) A template for the output filename. You can use placeholders that correspond to the parameter names in your design.
+  - `{bodyName}`: The name of the body being exported.
+  - `{YourParameterName}`: The value of a specific parameter for that variant (e.g., `{Size}`, `{Thickness}`).
+  - `{params}`: A default, auto-generated string of all parameter values (e.g., `Size_2-Thickness_5`).
+- `forceRecompute`: (Boolean, Optional) If `true`, the script will force Fusion 360 to recompute the entire model after changing parameters for each variant. This ensures complex changes are captured but can be disabled for faster exports on simple models. Defaults to `true`.
 
 ### `parametersToIterate` Object
 
-Each key in this object must match the **exact name** of a User Parameter in your Fusion 360 design (e.g., `"HandleWidth"`). The value for each key is another object with the following properties:
+Each key in this object must match the **exact name** of a User Parameter in your Fusion 360 design (e.g., `"Thickness"`). The value for each key is another object with the following properties:
 
-- `outputName`: (String) A short prefix that will be used in the filename for this parameter.
 - `variants`: (List of Numbers/Strings) A list of all the values you want to assign to this parameter. The script will iterate through each of these.
-- `grouping`: (Boolean, Optional) If you set this to `true`, this parameter will be used to create a subfolder. If omitted, it defaults to `false`.
+- `grouping`: (Boolean, Optional) If you set this to `true`, this parameter will be used to create a subfolder in the output directory. Defaults to `false`.
 
----
+## Sample Configurations
 
-## Example Configurations
+The `sample-config` directory provides examples for different use cases.
 
-Two example configuration files are included: `handle_config.json` and `drawer_config.json`.
+### `gridfinityHandles.json`
 
-### `handle_config.json`
+This file is a good example of a complex, multi-parameter export.
 
-This example is for a parametric handle.
+- **Exports:** `STL` files for a parametric handle.
+- **Grouping:** Creates a combined folder for each `Size` and `HandleWidth` pair (e.g., `export/Size-2-HandleWidth-16`).
+- **Filename:** Generates a detailed filename from four different parameters, like `Handle-s2-a105-th5mm-w16mm.stl`.
 
-```json
-{
-  "outputDirectory": "output",
-  "bodiesToExport": [
-    "Handle",
-    "Handle-wScrewHole"
-  ],
-  "parametersToIterate": {
-    "Size": {
-      "outputName": "x",
-      "variants": [2, 3, 4, 5],
-      "grouping": true
-    },
-    "HandleAngle": {
-      "outputName": "a",
-      "variants": [105, 115, 125, 135],
-      "grouping": true
-    },
-    "Thickness": {
-      "outputName": "th",
-      "variants": [5, 7, 9]
-    },
-    "HandleWidth": {
-      "outputName": "w",
-      "variants": [16, 23]
-    }
-  }
-}
-```
+### `gridfinityUnderDeskDrawers.json`
 
-- **Grouping:** This configuration will create folders based on the `Size` and `HandleAngle` parameters.
-- **Example Output:** A file exported with `Size=2`, `HandleAngle=105`, `Thickness=5`, and `HandleWidth=16` will be located at:
-  - `output/x2-a105/Handle-x2-a105-th5-w16.stl`
+This file demonstrates a simpler, single-parameter export.
 
-### `drawer_config.json`
-
-This example is for a parametric drawer.
+- **Exports:** `STEP` files for a parametric drawer.
+- **Grouping:** Creates a folder for each `COLUMNS` value (e.g., `drawer-exports/COLUMNS-2`).
+- **Filename:** Generates a name based on the body and the parameter, like `Drawer-c2.step`.
+- **Example Path:** `drawer-exports/COLUMNS-2/Drawer-Button-c2.step`
 
 ```json
 {
-  "outputDirectory": "output",
+  "outputDirectory": "output_drawers",
   "bodiesToExport": [
-    "Drawer",
-    "Drawer-Button",
-    "Drawer-Handle"
+    "Drawer"
   ],
+  "exportOptions": {
+    "fileType": "STEP",
+    "stlQuality": "Medium",
+    "fileNameTemplate": "Drawer-c{COLUMNS}"
+  },
   "parametersToIterate": {
     "COLUMNS": {
-      "outputName": "width",
-      "variants": [1, 2, 3, 4, 5],
+      "variants": [2, 3, 4],
       "grouping": true
-    },
-    "ROWS": {
-      "outputName": "depth",
-      "variants": [1, 2, 3, 4, 5]
     }
   }
 }
 ```
 
-- **Grouping:** This configuration will create folders based on the `COLUMNS` parameter.
-- **Example Output:** A file exported with `COLUMNS=2` and `ROWS=3` will be located at:
-  - `output/width2/Drawer-width2-depth3.stl` 
+- **Grouping:** This configuration will create a single subfolder for each combination of grouped parameters. For example, `output_drawers/Drawer-c2`.
+- **Custom Filename:** The `fileNameTemplate` creates highly descriptive and clean filenames.
+- **Example Output:** A file exported with `COLUMNS`=2 will be located at:
+  - `output_drawers/Drawer-c2/Drawer-c2.step` 

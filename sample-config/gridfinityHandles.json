@@ -1,26 +1,29 @@
 {
-  "outputDirectory": "output",
+  "outputDirectory": "export",
+  "exportOptions": {
+    "fileType": "STL",
+    "stlQuality": "High",
+    "fileNameTemplate": "{bodyName}-s{Size}-a{HandleAngle}-th{Thickness}mm-w{HandleWidth}mm",
+    "forceRecompute": true
+  },
   "bodiesToExport": [
     "Handle",
     "Handle-wScrewHole"
   ],
   "parametersToIterate": {
     "Size": {
-      "outputName": "x",
       "variants": [2, 3, 4, 5],
       "grouping": true
     },
     "HandleAngle": {
-      "outputName": "a",
       "variants": [105, 115, 125, 135]
     },
-    "Thickness": {
-      "outputName": "th",
-      "variants": [5, 7, 9]
+    "HandleWidth": {	
+      "variants": [16, 23],
+      "grouping": true
     },
-    "HandleWidth": {
-      "outputName": "w",
-      "variants": [16, 23]
+    "Thickness": {
+      "variants": [5, 7, 9]
     }
   }
 }

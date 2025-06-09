@@ -1,5 +1,10 @@
 {
-  "outputDirectory": "output",
+  "outputDirectory": "drawer-exports",
+  "exportOptions": {
+    "fileType": "STEP",
+    "fileNameTemplate": "{bodyName}-c{COLUMNS}",
+    "forceRecompute": true
+  },
   "bodiesToExport": [
     "Drawer",
     "Drawer-Button",
@@ -7,7 +12,6 @@
   ],
   "parametersToIterate": {
     "COLUMNS": {
-      "outputName": "width",
       "variants": [1, 2, 3, 4, 5],
       "grouping": true
     }
