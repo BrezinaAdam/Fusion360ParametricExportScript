@@ -33,7 +33,7 @@ The power of this script lies in the JSON configuration file. Here is a breakdow
 
 This optional object gives you fine-grained control over the output.
 
-- `fileType`: (String, Optional) The type of file to export. Supported values are `"STL"`, `"STEP"`, and `"IGES"`. Defaults to `"STL"`.
+- `fileType`: (String | String[], Optional) The type of file to export. Can be a single string or an array of strings (e.g., `["STL", "STEP"]`). Supported values are `"STL"`, `"STEP"`, and `"IGES"`. Defaults to `"STL"`.
 - `stlQuality`: (String, Optional) The mesh quality for STL exports. Supported values are `"High"`, `"Medium"`, and `"Low"`. Defaults to `"Medium"`.
 - `fileNameTemplate`: (String, Optional) A template for the output filename. You can use placeholders that correspond to the parameter names in your design.
   - `{bodyName}`: The name of the body being exported.
@@ -56,9 +56,42 @@ The `sample-config` directory provides examples for different use cases.
 
 This file is a good example of a complex, multi-parameter export.
 
-- **Exports:** `STL` files for a parametric handle.
+- **Exports:** Both `STL` and `STEP` files for each variant of a parametric handle.
 - **Grouping:** Creates a combined folder for each `Size` and `HandleWidth` pair (e.g., `export/Size-2-HandleWidth-16`).
-- **Filename:** Generates a detailed filename from four different parameters, like `Handle-s2-a105-th5mm-w16mm.stl`.
+- **Filename:** Generates a detailed filename from multiple parameters, like: `Handle-s2-a105-th5mm-w16mm.stl`.
+
+```json
+{
+  "outputDirectory": "export",
+  "exportOptions": {
+    "fileType": ["STL", "STEP"],
+    "stlQuality": "High",
+    "fileNameTemplate": "{bodyName}_size-{Size}_angle-{HandleAngle}_thick-{Thickness}mm_width-{HandleWidth}mm",
+    "forceRecompute": true
+  },
+  "bodiesToExport": [
+    "Handle",
+    "Handle-wScrewHole"
+  ],
+  "parametersToIterate": {
+    "Size": {
+      "variants": [2, 3, 4, 5],
+      "grouping": true
+    },
+    "HandleAngle": {
+      "variants": [105, 115, 125, 135]
+    },
+    "HandleWidth": {	
+      "variants": [16, 23],
+      "grouping": true
+    },
+    "Thickness": {
+      "variants": [5, 7, 9]
+    }
+  }
+}
+
+```
 
 ### `gridfinityUnderDeskDrawers.json`
 
@@ -71,25 +104,22 @@ This file demonstrates a simpler, single-parameter export.
 
 ```json
 {
-  "outputDirectory": "output_drawers",
-  "bodiesToExport": [
-    "Drawer"
-  ],
+  "outputDirectory": "drawer-exports",
   "exportOptions": {
     "fileType": "STEP",
-    "stlQuality": "Medium",
-    "fileNameTemplate": "Drawer-c{COLUMNS}"
+    "fileNameTemplate": "{bodyName} with {COLUMNS}x4 baseplate",
+    "forceRecompute": true
   },
+  "bodiesToExport": [
+    "Drawer",
+    "Drawer-Button",
+    "Drawer-Handle"
+  ],
   "parametersToIterate": {
     "COLUMNS": {
-      "variants": [2, 3, 4],
+      "variants": [1, 2, 3, 4, 5],
       "grouping": true
     }
   }
-}
+} 
 ```
-
-- **Grouping:** This configuration will create a single subfolder for each combination of grouped parameters. For example, `output_drawers/Drawer-c2`.
-- **Custom Filename:** The `fileNameTemplate` creates highly descriptive and clean filenames.
-- **Example Output:** A file exported with `COLUMNS`=2 will be located at:
-  - `output_drawers/Drawer-c2/Drawer-c2.step` 

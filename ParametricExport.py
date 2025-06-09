@@ -41,19 +41,18 @@ def find_body(design: adsk.fusion.Design, body_name: str) -> adsk.fusion.BRepBod
                 return body
     return None
 
-def export_body(body: adsk.fusion.BRepBody, filename: str, export_options: dict) -> bool:
-    """Exports a BRepBody to a file based on the provided export options."""
+def export_body(body: adsk.fusion.BRepBody, filename_base: str, file_type: str, export_options: dict) -> bool:
+    """Exports a BRepBody to a file of a specific type."""
     try:
         design = adsk.fusion.Design.cast(app.activeProduct)
         export_mgr = adsk.fusion.ExportManager.cast(design.exportManager)
         
-        file_type = export_options.get('fileType', 'STL').upper()
+        file_type_upper = file_type.upper()
         
-        # Ensure filename has the correct extension
-        if not filename.lower().endswith(f'.{file_type.lower()}'):
-            filename += f'.{file_type.lower()}'
+        # Add the extension to the base filename
+        filename = f"{filename_base}.{file_type_upper.lower()}"
 
-        if file_type == 'STL':
+        if file_type_upper == 'STL':
             options = export_mgr.createSTLExportOptions(body)
             
             quality_map = {
@@ -64,27 +63,21 @@ def export_body(body: adsk.fusion.BRepBody, filename: str, export_options: dict)
             quality_str = export_options.get('stlQuality', 'Medium').upper()
             options.meshRefinement = quality_map.get(quality_str, adsk.fusion.MeshRefinementSettings.MeshRefinementMedium)
 
-        elif file_type == 'STEP':
+        elif file_type_upper == 'STEP':
             options = export_mgr.createSTEPExportOptions(filename)
         
-        elif file_type == 'IGES':
+        elif file_type_upper == 'IGES':
             options = export_mgr.createIGESExportOptions(filename)
-
-        elif file_type == '3MF':
-            # Note: 3MF export requires a component, not just a body. 
-            # This is a simplification; for full 3MF support, this would need adjustment.
-            ui.messageBox("3MF export is not fully supported in this version. Use STL, STEP, or IGES.")
-            return False
             
         else:
-            ui.messageBox(f"Unsupported file type: {file_type}")
+            ui.messageBox(f"Unsupported file type: {file_type_upper}")
             return False
 
         options.filename = filename
         export_mgr.execute(options)
         return True
     except:
-        app.log(f"Failed to export body: {body.name}\n{traceback.format_exc()}")
+        app.log(f"Failed to export body {body.name} to {filename}\n{traceback.format_exc()}")
         return False
 
 def run(_context: str):
@@ -189,11 +182,19 @@ def run(_context: str):
                     ui.messageBox(f"The placeholder '{{{e.args[0]}}}' in your 'fileNameTemplate' is not a valid parameter name. Aborting.")
                     return
 
-                output_filename_full = os.path.join(final_export_dir, output_filename_base)
+                # --- NEW: Handle single or multiple file types ---
+                file_types_config = export_options.get('fileType', 'STL')
                 
-                if not export_body(target_body, output_filename_full, export_options):
-                    ui.messageBox(f'Failed to export file: {os.path.basename(output_filename_full)}.\nSee Text Commands for details.')
-                    return
+                # Ensure file_types is a list for uniform processing
+                file_types = file_types_config if isinstance(file_types_config, list) else [file_types_config]
+
+                for f_type in file_types:
+                    # The base filename is the full path without the extension
+                    output_filename_base_with_path = os.path.join(final_export_dir, output_filename_base)
+                    
+                    if not export_body(target_body, output_filename_base_with_path, f_type, export_options):
+                        ui.messageBox(f'Failed to export "{output_filename_base}" as {f_type.upper()}.\nSee Text Commands for details.')
+                        return # Abort on first failure
 
         if progress_bar.wasCancelled:
             ui.messageBox("Export cancelled by user.")

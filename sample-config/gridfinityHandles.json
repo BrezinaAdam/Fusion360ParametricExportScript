@@ -1,9 +1,9 @@
 {
   "outputDirectory": "export",
   "exportOptions": {
-    "fileType": "STL",
+    "fileType": ["STL", "STEP"],
     "stlQuality": "High",
-    "fileNameTemplate": "{bodyName}-s{Size}-a{HandleAngle}-th{Thickness}mm-w{HandleWidth}mm",
+    "fileNameTemplate": "{bodyName}_size-{Size}_angle-{HandleAngle}_thick-{Thickness}mm_width-{HandleWidth}mm",
     "forceRecompute": true
   },
   "bodiesToExport": [
