@@ -1,0 +1,26 @@
+{
+  "outputDirectory": "output",
+  "bodiesToExport": [
+    "Handle",
+    "Handle-wScrewHole"
+  ],
+  "parametersToIterate": {
+    "Size": {
+      "outputName": "x",
+      "variants": [2, 3, 4, 5],
+      "grouping": true
+    },
+    "HandleAngle": {
+      "outputName": "a",
+      "variants": [105, 115, 125, 135]
+    },
+    "Thickness": {
+      "outputName": "th",
+      "variants": [5, 7, 9]
+    },
+    "HandleWidth": {
+      "outputName": "w",
+      "variants": [16, 23]
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+	"autodeskProduct":	"Fusion",
+	"type":	"script",
+	"author":	"Adam Brezina",
+	"description":	{
+		"":	"Exports handles with different parameter combinations to STL files automagically."
+	},
+	"version":	"1.0.0",
+	"supportedOS":	"windows|mac",
+	"editEnabled":	true,
+	"iconFilename":	"icon.svg",
+	"runOnStartup":	false,
+	"minimumVersion":	"2.0.0"
+}

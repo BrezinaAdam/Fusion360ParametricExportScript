@@ -1,0 +1,15 @@
+{
+  "outputDirectory": "output",
+  "bodiesToExport": [
+    "Drawer",
+    "Drawer-Button",
+    "Drawer-Handle"
+  ],
+  "parametersToIterate": {
+    "COLUMNS": {
+      "outputName": "width",
+      "variants": [1, 2, 3, 4, 5],
+      "grouping": true
+    }
+  }
+} 
