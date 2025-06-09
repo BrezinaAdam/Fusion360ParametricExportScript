@@ -1,4 +1,4 @@
-# Parametric Export for Fusion 360
+# <img src="icon.svg" width="48" height="48" alt="Parametric Export Icon"> Parametric Export for Fusion 360
 
 This Fusion 360 script, `ParametricExport.py`, allows you to automate the process of exporting multiple variations of your parametric designs. Instead of manually changing parameters and exporting STL files one by one, you can define all desired variations in a simple JSON configuration file and let the script do the work for you.
 
