@@ -2,7 +2,7 @@
   "outputDirectory": "drawer-exports",
   "exportOptions": {
     "fileType": "STEP",
-    "fileNameTemplate": "{bodyName}-c{COLUMNS}",
+    "fileNameTemplate": "{bodyName} with {COLUMNS}x4 baseplate",
     "forceRecompute": true
   },
   "bodiesToExport": [
